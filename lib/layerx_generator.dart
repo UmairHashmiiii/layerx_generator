@@ -1,11 +1,96 @@
+/// A Flutter package that auto-generates the LayerX directory structure for your project.
+///
+/// The `layerx_generator` package simplifies the setup of a scalable Flutter project by generating
+/// a clean MVVM (Model-View-ViewModel) directory structure under `lib/app/`. It includes pre-configured
+/// utilities for HTTP requests, local storage, and error handling, all integrated with the GetX package
+/// for state management, navigation, and dependency injection.
+///
+/// ## Features
+/// - Generates a well-organized MVVM directory structure.
+/// - Includes pre-built services like `HttpsCalls`, `SharedPreferencesService`, and `MessageExtractor`.
+/// - Integrates with GetX for navigation and state management.
+/// - Supports responsive design with `flutter_screenutil`.
+///
+/// ## Usage
+/// You can use this package via the command line or programmatically:
+///
+/// ### Command-Line
+/// ```bash
+/// dart run layerx_generator --path .
+/// ```
+///
+/// ### Programmatically
+/// ```dart
+/// import 'package:layerx_generator/layerx_generator.dart';
+/// import 'dart:io';
+///
+/// void main() async {
+///   final generator = LayerXGenerator(Directory.current.path);
+///   await generator.generate();
+/// }
+/// ```
+///
+/// See the [README](https://pub.dev/packages/layerx_generator) for more details.
+library layerx_generator;
+
 import 'dart:io';
 import 'package:path/path.dart' as path;
 
+/// A class that generates the LayerX directory structure for a Flutter project.
+///
+/// The `LayerXGenerator` class is the main entry point for the `layerx_generator` package.
+/// It creates a predefined directory structure under `lib/app/`, including configuration files,
+/// MVVM directories, services, and repositories, all integrated with GetX for state management
+/// and navigation.
+///
+/// ## Example
+/// ```dart
+/// import 'package:layerx_generator/layerx_generator.dart';
+/// import 'dart:io';
+///
+/// void main() async {
+///   final generator = LayerXGenerator(Directory.current.path);
+///   await generator.generate();
+///   print('LayerX structure generated successfully!');
+/// }
+/// ```
 class LayerXGenerator {
+  /// The path to the Flutter project directory where the LayerX structure will be generated.
+  ///
+  /// This property specifies the root directory of the project. The generator will create
+  /// the `lib/app/` directory structure within this path.
   final String projectPath;
 
+  /// Creates a new instance of [LayerXGenerator].
+  ///
+  /// ## Parameters
+  /// - [projectPath]: The path to the Flutter project directory. This must be a valid directory path.
+  ///
+  /// ## Throws
+  /// - [Exception]: If the specified [projectPath] does not exist.
   LayerXGenerator(this.projectPath);
 
+  /// Generates the LayerX directory structure and updates necessary files.
+  ///
+  /// This method creates the following structure under `lib/app/`:
+  /// - `config/`: Configuration files (e.g., colors, routes, strings).
+  /// - `mvvm/`: MVVM directories for models, views, and view models.
+  /// - `repository/`: Repository directories for API and local data access.
+  /// - `services/`: Pre-built services for HTTP requests, local storage, and error handling.
+  /// - `widgets/`: Directory for custom widgets.
+  ///
+  /// It also updates:
+  /// - `lib/app/app_widget.dart`: The root widget with GetX and `flutter_screenutil` integration.
+  /// - `lib/main.dart`: The entry point to use the `LayerXApp` widget.
+  ///
+  /// ## Throws
+  /// - [Exception]: If the project directory does not exist or if there are issues creating directories/files.
+  ///
+  /// ## Example
+  /// ```dart
+  /// final generator = LayerXGenerator(Directory.current.path);
+  /// await generator.generate();
+  /// ```
   Future<void> generate() async {
     try {
       final projectDir = Directory(projectPath);
@@ -80,58 +165,6 @@ abstract class AppRoutes {
   static const splashView = '/splashView';
   static const signInView = '/signInView';
 }
-
-// abstract class AppRoutes {
-//   AppRoutes._();
-//
-//   static const splashView = '/splashView';
-//   static const notificationView = '/notificationView';
-//   static const signInView = '/signInView';
-//   static const signUpView = '/signUpView';
-//   static const membershipView = '/membershipView';
-//   static const navbarView = '/navbarView';
-//   static const drawerView = '/drawerView';
-//   static const changePasswordView = '/changePasswordView';
-//   static const confirmOtpView = '/confirmOtpView';
-//   static const accountDeletionView = '/accountDeletionView';
-//
-//   static const privacyPolicyView = '/privacyPolicyView';
-//   static const termsAndConditionsView = '/termsAndConditionsView';
-//   static const personalDetailsView = '/personalDetailsView';
-//   static const aboutUsView = '/aboutUsView';
-//   static const subscriptionView = '/subscriptionView';
-//   static const charityInstituteView = '/charityInstituteView';
-//   static const screeningDetailView = '/screeningDetailView';
-//
-// //ss
-// }
-//
-// abstract class AppPages {
-//   AppPages._();
-//
-//   static final routes = <GetPage>[
-//     GetPage(
-//         name: AppRoutes.splashView,
-//         page: () => const SplashView(),
-//         transition: Transition.fade, // Transition added
-//         binding: BindingsBuilder(() {
-//           Get.lazyPut<SplashController>(() => SplashController());
-//         })),
-//     GetPage(
-//         name: AppRoutes.notificationView,
-//         page: () => const NotificationView(),
-//         transition: Transition.zoom, // Transition added
-//         binding: BindingsBuilder(() {
-//           // Get.lazyPut<SplashController>(() => SplashController());
-//         })),
-//     GetPage(
-//         name: AppRoutes.signInView,
-//         page: () => const SignInView(),
-//         transition: Transition.rightToLeft, // Transition added
-//         binding: BindingsBuilder(() {
-//           Get.lazyPut<SignInController>(() => SignInController());
-//         })),
-
 ''');
 
     await File(path.join(configDir.path, 'app_pages.dart')).writeAsString('''
@@ -161,7 +194,8 @@ abstract class AppUrls {
 }
 ''');
 
-    await File(path.join(configDir.path, 'app_text_style.dart')).writeAsString('''
+    await File(path.join(configDir.path, 'app_text_style.dart'))
+        .writeAsString('''
 import 'package:flutter/material.dart';
 
 abstract class AppTextStyles {
@@ -172,13 +206,15 @@ abstract class AppTextStyles {
 }
 ''');
 
-    await File(path.join(configDir.path, 'global_variable.dart')).writeAsString('''
+    await File(path.join(configDir.path, 'global_variable.dart'))
+        .writeAsString('''
 class GlobalVariables {
   static List<String> errorMessages = [];
 }
 ''');
 
-    await File(path.join(configDir.path, 'padding_extensions.dart')).writeAsString('''
+    await File(path.join(configDir.path, 'padding_extensions.dart'))
+        .writeAsString('''
 import 'package:flutter/material.dart';
 
 extension PaddingExtension on Widget {
@@ -202,11 +238,15 @@ class AppConfig {
   }
 
   Future<void> _createModelFiles(String appDirPath) async {
-    final bodyModelDir = Directory(path.join(appDirPath, 'mvvm', 'model', 'body_model'));
-    final responseModelDir = Directory(path.join(appDirPath, 'mvvm', 'model', 'response_model'));
-    final apiResponseModelDir = Directory(path.join(appDirPath, 'mvvm', 'model', 'api_response_model'));
+    final bodyModelDir =
+        Directory(path.join(appDirPath, 'mvvm', 'model', 'body_model'));
+    final responseModelDir =
+        Directory(path.join(appDirPath, 'mvvm', 'model', 'response_model'));
+    final apiResponseModelDir =
+        Directory(path.join(appDirPath, 'mvvm', 'model', 'api_response_model'));
 
-    await File(path.join(bodyModelDir.path, 'example_body_model.dart')).writeAsString('''
+    await File(path.join(bodyModelDir.path, 'example_body_model.dart'))
+        .writeAsString('''
 class ExampleBodyModel {
   String? field;
 
@@ -216,7 +256,8 @@ class ExampleBodyModel {
 }
 ''');
 
-    await File(path.join(responseModelDir.path, 'example_response_model.dart')).writeAsString('''
+    await File(path.join(responseModelDir.path, 'example_response_model.dart'))
+        .writeAsString('''
 class ExampleResponseModel {
   String? field;
 
@@ -228,7 +269,8 @@ class ExampleResponseModel {
 }
 ''');
 
-    await File(path.join(apiResponseModelDir.path, 'api_response.dart')).writeAsString('''
+    await File(path.join(apiResponseModelDir.path, 'api_response.dart'))
+        .writeAsString('''
 class ApiResponse<T> {
   final bool? success;
   final String? message;
@@ -252,8 +294,8 @@ class ApiResponse<T> {
   Future<void> _createServiceFiles(String appDirPath) async {
     final servicesDir = Directory(path.join(appDirPath, 'services'));
 
-    // https_service.dart
-    await File(path.join(servicesDir.path, 'https_service.dart')).writeAsString('''
+    await File(path.join(servicesDir.path, 'https_service.dart'))
+        .writeAsString('''
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -368,59 +410,59 @@ class HttpsCalls {
     return _performRequest(lControllerUrl, () => _sendRequest(HttpMethod.DELETE, lControllerUrl, body: lUtfContent));
   }
 
-  // Future<http.Response> _multipartRequest(
-  //   String lControllerUrl,
-  //   dynamic model, {
-  //   String? fileKey,
-  //   String? filePath,
-  // }) async {
-  //   final token = await SharedPreferencesService().readToken();
-  //   final url = Uri.parse(ApiUrls.baseAPIURL + lControllerUrl);
-  //   var request = http.MultipartRequest('POST', url);
-  //
-  //   request.headers.addAll({
-  //     HttpHeaders.contentTypeHeader: 'multipart/form-data',
-  //     HttpHeaders.acceptHeader: 'application/json',
-  //     if (token != null) HttpHeaders.authorizationHeader: 'Bearer \$token',
-  //   });
-  //
-  //   final modelJson = model.toJson();
-  //   modelJson.forEach((key, value) {
-  //     if (value is String || value is int || value is double) {
-  //       request.fields[key] = value.toString();
-  //     }
-  //   });
-  //
-  //   if (fileKey != null && filePath != null) {
-  //     var file = await http.MultipartFile.fromPath(fileKey, filePath);
-  //     request.files.add(file);
-  //   }
-  //
-  //   var streamedResponse = await request.send();
-  //   return await http.Response.fromStream(streamedResponse);
-  // }
-  //
-  // Future<http.Response> multipartApiHits(
-  //   String lControllerUrl,
-  //   dynamic model, {
-  //   String? fileKey,
-  //   String? filePath,
-  // }) {
-  //   return _performRequest(
-  //     lControllerUrl,
-  //     () => _multipartRequest(
-  //       lControllerUrl,
-  //       model,
-  //       fileKey: fileKey,
-  //       filePath: filePath,
-  //     ),
-  //   );
-  // }
+  Future<http.Response> _multipartRequest(
+    String lControllerUrl,
+    dynamic model, {
+    String? fileKey,
+    String? filePath,
+  }) async {
+    final token = await SharedPreferencesService().readToken();
+    final url = Uri.parse(ApiUrls.baseAPIURL + lControllerUrl);
+    var request = http.MultipartRequest('POST', url);
+
+    request.headers.addAll({
+      HttpHeaders.contentTypeHeader: 'multipart/form-data',
+      HttpHeaders.acceptHeader: 'application/json',
+      if (token != null) HttpHeaders.authorizationHeader: 'Bearer \$token',
+    });
+
+    final modelJson = model.toJson();
+    modelJson.forEach((key, value) {
+      if (value is String || value is int || value is double) {
+        request.fields[key] = value.toString();
+      }
+    });
+
+    if (fileKey != null && filePath != null) {
+      var file = await http.MultipartFile.fromPath(fileKey, filePath);
+      request.files.add(file);
+    }
+
+    var streamedResponse = await request.send();
+    return await http.Response.fromStream(streamedResponse);
+  }
+
+  Future<http.Response> multipartApiHits(
+    String lControllerUrl,
+    dynamic model, {
+    String? fileKey,
+    String? filePath,
+  }) {
+    return _performRequest(
+      lControllerUrl,
+      () => _multipartRequest(
+        lControllerUrl,
+        model,
+        fileKey: fileKey,
+        filePath: filePath,
+      ),
+    );
+  }
 }
 ''');
 
-    // shared_preferences_helper.dart
-    await File(path.join(servicesDir.path, 'shared_preferences_helper.dart')).writeAsString('''
+    await File(path.join(servicesDir.path, 'shared_preferences_helper.dart'))
+        .writeAsString('''
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logger/logger.dart';
@@ -464,7 +506,7 @@ class SharedPreferencesService {
     String? data = prefs.getString(_keyUserData);
     if (data != null) {
       Map<String, dynamic> jsonData = json.decode(data);
-      return jsonData; // Modify this to return a specific model if needed
+      return jsonData;
     }
     return null;
   }
@@ -481,8 +523,8 @@ class SharedPreferencesService {
 }
 ''');
 
-    // json_extractor.dart
-    await File(path.join(servicesDir.path, 'json_extractor.dart')).writeAsString('''
+    await File(path.join(servicesDir.path, 'json_extractor.dart'))
+        .writeAsString('''
 import 'dart:convert';
 import 'package:logger/logger.dart';
 import '../config/global_variables.dart';
@@ -519,9 +561,11 @@ class MessageExtractor {
   }
 
   Future<void> _createRepositoryFiles(String appDirPath) async {
-    final authRepoDir = Directory(path.join(appDirPath, 'repository', 'auth_repo'));
+    final authRepoDir =
+        Directory(path.join(appDirPath, 'repository', 'auth_repo'));
 
-    await File(path.join(authRepoDir.path, 'example_repo.dart')).writeAsString('''
+    await File(path.join(authRepoDir.path, 'example_repo.dart'))
+        .writeAsString('''
 import 'package:get/get.dart';
 import '../../services/https_service.dart';
 import '../../services/json_extractor.dart';
@@ -534,94 +578,11 @@ class ExampleRepo {
     try {
       final response = await _httpsCalls.getApiHits(endpoint);
       _messageExtractor.extractAndStoreMessage(endpoint, response.body);
-      // Process response as needed
     } catch (e) {
       rethrow;
     }
   }
 }
-
-
-
-// class AppSettingsRepo {
-//   final logger = Logger();
-//
-//   Future<ApiResponse<SettingsData>> fetchAppSettingsApi() async {
-//     try {
-//       String? endPoint = ApiUrls.appSettings;
-//       final response = await HttpsCalls().getApiHits(endPoint);
-//       return await _processResponse(response, (dataJson) => SettingsData.fromJson(dataJson));
-//     } catch (e, stackTrace) {
-//       _logUnhandledError(e, stackTrace);
-//       rethrow;
-//     }
-//   }
-//
-//   Future<ApiResponse<T>> _processResponse<T>(
-//       dynamic response,
-//       T Function(dynamic dataJson) fromJson,
-//       ) async {
-//     MessageExtractor().extractAndStoreMessage('', response.body);
-//
-//     switch (response.statusCode) {
-//       case 200:
-//       case 201:
-//       // Use compute for large JSON payloads, otherwise decode directly
-//         final parsedJson = response.body.length > 100000
-//             ? await compute<String, dynamic>(_parseJson, response.body) // Explicit type arguments
-//             : jsonDecode(response.body);
-//
-//         return ApiResponse<T>.fromJson(parsedJson, fromJson);
-//
-//       case 401:
-//         _handleUnauthorized();
-//         break;
-//
-//       case 422:
-//         _handleError(response, "Validation Error");
-//         break;
-//
-//       case 500:
-//         _handleError(response, "Internal Server Error");
-//         break;
-//
-//       default:
-//         _handleError(
-//           response,
-//           "API Error: {response.statusCode} - {response.reasonPhrase}",
-//         );
-//     }
-//     throw Exception("Unexpected error occurred.");
-//   }
-//
-//
-//   dynamic _parseJson(String responseBody) {
-//     return jsonDecode(responseBody);
-//   }
-//
-//   void _handleUnauthorized() {
-//     logger.w("Unauthorized access. Redirecting to login.");
-//     Get.offAllNamed(AppRoutes.signInView);
-//     throw Exception("Unauthorized access. Please log in.");
-//   }
-//
-//   void _handleError(dynamic response, String errorMessage) {
-//     try {
-//       final errorResponse = jsonDecode(response.body);
-//       throw Exception("errorMessage: {errorResponse['message'] ?? 'No details available'}");
-//     } catch (e) {
-//       logger.e("Error handling failed: e");
-//       throw Exception(errorMessage);
-//     }
-//   }
-//
-//   void _logUnhandledError(dynamic e, StackTrace stackTrace) {
-//     logger.e('Unhandled error: e', error: e, stackTrace: stackTrace);
-//   }
-// }
-
-
-
 ''');
 
     print('Created placeholder files in repository/');
