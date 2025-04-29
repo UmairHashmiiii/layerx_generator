@@ -1,26 +1,36 @@
-/// A Flutter package that auto-generates the LayerX directory structure for your project.
+/// A Flutter package that auto-generates the LayerX directory structure for scalable MVVM projects.
 ///
-/// The `layerx_generator` package simplifies the setup of a scalable Flutter project by generating
-/// a clean MVVM (Model-View-ViewModel) directory structure under `lib/app/`. It includes pre-configured
-/// utilities for HTTP requests, local storage, location services, and API response handling, all integrated
-/// with the GetX package for state management, navigation, and dependency injection.
+/// The `layerx_generator` package simplifies the setup of a Flutter project by generating
+/// a clean MVVM (Model-View-ViewModel) directory structure under `lib/app/`. It includes
+/// pre-configured utilities for HTTP requests, local storage, location services, logging,
+/// and API response handling, all integrated with GetX for state management, navigation,
+/// and dependency injection.
 ///
 /// ## Features
-/// - Generates a well-organized MVVM directory structure.
-/// - Includes pre-built services like `HttpsCalls`, `SharedPreferencesService`, `LocationService`, and `ApiResponseHandler`.
-/// - Integrates with GetX for navigation and state management.
+/// - Generates a well-organized MVVM directory structure with `config/`, `mvvm/`, `repository/`, `services/`, and `widgets/` directories.
+/// - Includes services: `HttpsCalls` (with multipart support), `SharedPreferencesService`, `LocationService`, `ApiResponseHandler`, and `LoggerService` (with custom formatting).
+/// - Provides a dynamic `ApiResponse<T>` model for flexible API data parsing.
+/// - Integrates GetX for navigation and state management.
 /// - Supports responsive design with `flutter_screenutil`.
-/// - Provides a dynamic `ApiResponse` model for flexible API data parsing.
+/// - Includes standardized repositories (`AuthRepository`, `DataRepository`) for API interactions.
+///
+/// ## Installation
+/// Add `layerx_generator` as a dev dependency in your `pubspec.yaml`:
+/// ```yaml
+/// dev_dependencies:
+///   layerx_generator: ^1.0.5
+/// ```
+/// Run:
+/// ```bash
+/// flutter pub get
+/// ```
 ///
 /// ## Usage
-/// You can use this package via the command line or programmatically:
-///
-/// ### Command-Line
+/// Generate the LayerX structure using the command line:
 /// ```bash
 /// dart run layerx_generator --path .
 /// ```
-///
-/// ### Programmatically
+/// Or programmatically:
 /// ```dart
 /// import 'package:layerx_generator/layerx_generator.dart';
 /// import 'dart:io';
@@ -31,18 +41,29 @@
 /// }
 /// ```
 ///
-/// See the [README](https://pub.dev/packages/layerx_generator) for more details.
+/// ## Generated Structure
+/// - `config/`: App configurations (e.g., `AppUrls`, `AppRoutes`, `AppColors`).
+/// - `mvvm/`: Models (`ApiResponse<T>`, body models), views, and view models.
+/// - `repository/`: API and local data repositories (`AuthRepository`, `DataRepository`).
+/// - `services/`: Utilities for HTTP (`HttpsCalls`), location (`LocationService`), logging (`LoggerService`), and more.
+/// - `widgets/`: Custom widget directory.
+/// - Updates `main.dart` and `pubspec.yaml` for immediate use.
+///
+/// ## Example
+/// See the [example/](https://github.com/[your-username]/layerx_generator/tree/main/example) directory for a sample project using the generated structure.
+///
+/// ## Documentation
+/// Full documentation is available on [pub.dev](https://pub.dev/packages/layerx_generator).
 library layerx_generator;
 
 import 'dart:io';
 import 'package:path/path.dart' as path;
 
-/// A class that generates the LayerX directory structure for a Flutter project.
+/// Generates the LayerX directory structure for a Flutter project.
 ///
-/// The `LayerXGenerator` class is the main entry point for the `layerx_generator` package.
-/// It creates a predefined directory structure under `lib/app/`, including configuration files,
-/// MVVM directories, services, and repositories, all integrated with GetX for state management
-/// and navigation.
+/// The `LayerXGenerator` class is the main entry point for the package. It creates
+/// a predefined MVVM structure under `lib/app/`, including configuration files,
+/// services, repositories, and models, all integrated with GetX.
 ///
 /// ## Example
 /// ```dart
@@ -62,28 +83,28 @@ class LayerXGenerator {
   /// Creates a new instance of [LayerXGenerator].
   ///
   /// ## Parameters
-  /// - [projectPath]: The path to the Flutter project directory. This must be a valid directory path.
+  /// - [projectPath]: The path to the Flutter project directory. Must be a valid directory.
   ///
   /// ## Throws
-  /// - [Exception]: If the specified [projectPath] does not exist.
+  /// - [Exception]: If the [projectPath] does not exist.
   LayerXGenerator(this.projectPath);
 
   /// Generates the LayerX directory structure and updates necessary files.
   ///
-  /// This method creates the following structure under `lib/app/`:
-  /// - `config/`: Configuration files (e.g., colors, routes, strings).
-  /// - `mvvm/`: MVVM directories for models, views, and view models.
-  /// - `repository/`: Repository directories for API and local data access.
-  /// - `services/`: Pre-built services for HTTP requests, local storage, and error handling.
-  /// - `widgets/`: Directory for custom widgets.
+  /// Creates:
+  /// - `lib/app/config/`: Configuration files (e.g., colors, routes).
+  /// - `lib/app/mvvm/`: Model, view, and view model directories.
+  /// - `lib/app/repository/`: Repositories for API and local data.
+  /// - `lib/app/services/`: Services for HTTP, location, logging, etc.
+  /// - `lib/app/widgets/`: Custom widget directory.
   ///
-  /// It also updates:
-  /// - `lib/app/app_widget.dart`: The root widget with GetX and `flutter_screenutil` integration.
-  /// - `lib/main.dart`: The entry point to use the `LayerXApp` widget.
-  /// - `pubspec.yaml`: Adds required dependencies.
+  /// Updates:
+  /// - `lib/app/app_widget.dart`: Root widget with GetX and `flutter_screenutil`.
+  /// - `lib/main.dart`: Entry point using `LayerXApp`.
+  /// - `pubspec.yaml`: Adds required dependencies (e.g., `get`, `intl`).
   ///
   /// ## Throws
-  /// - [Exception]: If the project directory does not exist or if there are issues creating directories/files.
+  /// - [Exception]: If the project directory is invalid or file operations fail.
   Future<void> generate() async {
     try {
       final projectDir = Directory(projectPath);
@@ -132,6 +153,7 @@ class LayerXGenerator {
     final configDir = Directory(path.join(appDirPath, 'config'));
 
     await File(path.join(configDir.path, 'app_assets.dart')).writeAsString('''
+/// Defines asset paths for the LayerX app.
 class AppAssets {
   static const String imagesPath = 'assets/images';
   static const String bgImage = '\$imagesPath/bg_image.png';
@@ -141,6 +163,7 @@ class AppAssets {
     await File(path.join(configDir.path, 'app_colors.dart')).writeAsString('''
 import 'package:flutter/material.dart';
 
+/// Defines color constants for the LayerX app.
 abstract class AppColors {
   AppColors._();
   static const Color primary = Color(0xFF24B986);
@@ -150,10 +173,12 @@ abstract class AppColors {
 ''');
 
     await File(path.join(configDir.path, 'app_enums.dart')).writeAsString('''
+/// Defines enums for the LayerX app.
 enum UserRole { USER, BUSINESS }
 ''');
 
     await File(path.join(configDir.path, 'app_routes.dart')).writeAsString('''
+/// Defines navigation routes for the LayerX app.
 abstract class AppRoutes {
   AppRoutes._();
   static const splashView = '/splashView';
@@ -165,6 +190,7 @@ abstract class AppRoutes {
     await File(path.join(configDir.path, 'app_pages.dart')).writeAsString('''
 import 'package:get/get.dart';
 
+/// Configures GetX routes for the LayerX app.
 abstract class AppPages {
   AppPages._();
   static final routes = <GetPage>[
@@ -175,6 +201,7 @@ abstract class AppPages {
 ''');
 
     await File(path.join(configDir.path, 'app_strings.dart')).writeAsString('''
+/// Defines string constants for the LayerX app.
 abstract class AppStrings {
   AppStrings._();
   static const welcomeText = 'Welcome to LayerX';
@@ -182,6 +209,7 @@ abstract class AppStrings {
 ''');
 
     await File(path.join(configDir.path, 'app_urls.dart')).writeAsString('''
+/// Defines API endpoints for the LayerX app.
 abstract class AppUrls {
   AppUrls._();
   static const String baseAPIURL = 'https://api.example.com/';
@@ -194,8 +222,9 @@ abstract class AppUrls {
     await File(path.join(configDir.path, 'app_text_style.dart')).writeAsString('''
 import 'package:flutter/material.dart';
 
+/// Defines text styles for the LayerX app.
 abstract class AppTextStyles {
-  AppTextStyles._();
+  AppTiles._();
   static TextStyle bodyText({Color? color}) {
     return TextStyle(fontSize: 16, color: color ?? Colors.black);
   }
@@ -203,6 +232,7 @@ abstract class AppTextStyles {
 ''');
 
     await File(path.join(configDir.path, 'global_variable.dart')).writeAsString('''
+/// Stores global variables for the LayerX app.
 class GlobalVariables {
   static List<String> errorMessages = [];
 }
@@ -211,18 +241,21 @@ class GlobalVariables {
     await File(path.join(configDir.path, 'padding_extensions.dart')).writeAsString('''
 import 'package:flutter/material.dart';
 
+/// Adds padding extensions for widgets in the LayerX app.
 extension PaddingExtension on Widget {
   Widget paddingAll(double padding) => Padding(padding: EdgeInsets.all(padding), child: this);
 }
 ''');
 
     await File(path.join(configDir.path, 'utils.dart')).writeAsString('''
+/// Provides utility functions for the LayerX app.
 class Utils {
   static String formatDate(DateTime date) => date.toIso8601String();
 }
 ''');
 
     await File(path.join(configDir.path, 'config.dart')).writeAsString('''
+/// Defines app configuration for the LayerX app.
 class AppConfig {
   static const String appName = 'LayerX App';
 }
@@ -237,6 +270,7 @@ class AppConfig {
     final apiResponseModelDir = Directory(path.join(appDirPath, 'mvvm', 'model', 'api_response_model'));
 
     await File(path.join(bodyModelDir.path, 'driver_signup_body_model.dart')).writeAsString('''
+/// Model for driver signup data with multipart support.
 class DriverSignupBodyModel {
   String? name;
   String? email;
@@ -254,6 +288,7 @@ class DriverSignupBodyModel {
 ''');
 
     await File(path.join(bodyModelDir.path, 'garage_signup_body_model.dart')).writeAsString('''
+/// Model for garage signup data with multipart support.
 class GarageSignupBodyModel {
   String? name;
   File? image;
@@ -267,6 +302,7 @@ class GarageSignupBodyModel {
 ''');
 
     await File(path.join(bodyModelDir.path, 'add_car_body_model.dart')).writeAsString('''
+/// Model for adding car data with multipart support.
 class AddCarBodyModel {
   String? model;
   File? image;
@@ -291,6 +327,7 @@ class AddCarBodyModel {
 ''');
 
     await File(path.join(bodyModelDir.path, 'buy_car_request.dart')).writeAsString('''
+/// Model for car purchase request data with multipart support.
 class BuyCarRequestModel {
   String? carId;
   File? image;
@@ -304,6 +341,7 @@ class BuyCarRequestModel {
 ''');
 
     await File(path.join(responseModelDir.path, 'example_response_model.dart')).writeAsString('''
+/// Example response model for API data.
 class ExampleResponseModel {
   String? field;
 
@@ -316,6 +354,7 @@ class ExampleResponseModel {
 ''');
 
     await File(path.join(apiResponseModelDir.path, 'api_response.dart')).writeAsString('''
+/// Generic API response model for flexible data parsing.
 class ApiResponse<T> {
   final bool? success;
   final String? message;
@@ -332,9 +371,9 @@ class ApiResponse<T> {
   });
 
   factory ApiResponse.fromJson(
-      Map<String, dynamic> json,
-      T Function(dynamic json) fromJsonT,
-      ) {
+    Map<String, dynamic> json,
+    T Function(dynamic json) fromJsonT,
+  ) {
     final status = json['status'];
     final success = json['success'];
     final isSuccess = success == true || status == 'success';
@@ -392,10 +431,13 @@ import '../mvvm/model/body_model/driver_signup_body_model.dart';
 import '../mvvm/model/body_model/garage_signup_body_model.dart';
 import '../mvvm/model/body_model/add_car_body_model.dart';
 import '../mvvm/model/body_model/buy_car_request.dart';
+import 'logger_service.dart';
 import 'shared_preferences_service.dart';
 
+/// Enum for HTTP methods supported by HttpsCalls.
 enum HttpMethod { GET, POST, PUT, PATCH, DELETE }
 
+/// Service for making HTTP requests with retry and multipart support.
 class HttpsCalls {
   final _ongoingRequests = <String, Future<http.Response>>{};
   final Duration _timeoutDuration = const Duration(seconds: 20);
@@ -414,16 +456,19 @@ class HttpsCalls {
         _ongoingRequests[key] = responseFuture;
         final response = await responseFuture;
         _ongoingRequests.remove(key);
+        LoggerService.i('Request succeeded for \$key');
         return response;
       } on TimeoutException catch (e) {
         if (retryCount == _maxRetries) {
           _ongoingRequests.remove(key);
+          LoggerService.e('Request timed out after \$_maxRetries retries: \$e');
           throw Exception('Request timed out after \$_maxRetries retries: \$e');
         }
         await Future.delayed(Duration(seconds: 2 * retryCount));
       } catch (e, stackTrace) {
         if (retryCount == _maxRetries) {
           _ongoingRequests.remove(key);
+          LoggerService.e('Request failed after \$_maxRetries retries: \$e', error: e, stackTrace: stackTrace);
           throw Exception('Request failed after \$_maxRetries retries: \$e\\n\$stackTrace');
         }
         await Future.delayed(Duration(seconds: 2 * retryCount));
@@ -449,6 +494,7 @@ class HttpsCalls {
   }) async {
     final headers = await _getDefaultHeaders();
     final url = Uri.parse(AppUrls.baseAPIURL + lControllerUrl);
+    LoggerService.d('Sending \$method request to \$url');
     switch (method) {
       case HttpMethod.GET:
         return await http.get(url, headers: headers);
@@ -484,10 +530,10 @@ class HttpsCalls {
   }
 
   Future<http.Response> _genericMultipartRequest(
-      String endpointUrl,
-      dynamic model, {
-        Map<String, dynamic Function()>? fileExtractors,
-      }) async {
+    String endpointUrl,
+    dynamic model, {
+    Map<String, dynamic Function()>? fileExtractors,
+  }) async {
     final token = await SharedPreferencesService().readToken();
     final url = Uri.parse(AppUrls.baseAPIURL + endpointUrl);
     final request = http.MultipartRequest('POST', url);
@@ -515,17 +561,18 @@ class HttpsCalls {
         }
       }
     }
+    LoggerService.d('Sending multipart request to \$endpointUrl');
     final streamedResponse = await request.send();
     return await http.Response.fromStream(streamedResponse);
   }
 
   Future<http.Response> multipartDriverProfileApiHits(
-      String lControllerUrl,
-      DriverSignupBodyModel profileMultipart,
-      ) {
+    String lControllerUrl,
+    DriverSignupBodyModel profileMultipart,
+  ) {
     return _performRequest(
       lControllerUrl,
-          () => _genericMultipartRequest(
+      () => _genericMultipartRequest(
         lControllerUrl,
         profileMultipart,
         fileExtractors: {
@@ -538,12 +585,12 @@ class HttpsCalls {
   }
 
   Future<http.Response> multipartGarageProfileApiHits(
-      String lControllerUrl,
-      GarageSignupBodyModel profileMultipart,
-      ) {
+    String lControllerUrl,
+    GarageSignupBodyModel profileMultipart,
+  ) {
     return _performRequest(
       lControllerUrl,
-          () => _genericMultipartRequest(
+      () => _genericMultipartRequest(
         lControllerUrl,
         profileMultipart,
         fileExtractors: {
@@ -554,12 +601,12 @@ class HttpsCalls {
   }
 
   Future<http.Response> multipartBuyCarRequestApi(
-      String lControllerUrl,
-      BuyCarRequestModel buyRequestMultipart,
-      ) {
+    String lControllerUrl,
+    BuyCarRequestModel buyRequestMultipart,
+  ) {
     return _performRequest(
       lControllerUrl,
-          () => _genericMultipartRequest(
+      () => _genericMultipartRequest(
         lControllerUrl,
         buyRequestMultipart,
         fileExtractors: {
@@ -570,12 +617,12 @@ class HttpsCalls {
   }
 
   Future<http.Response> crudCarMultipartApi(
-      String lControllerUrl,
-      AddCarBodyModel carDataModel,
-      ) {
+    String lControllerUrl,
+    AddCarBodyModel carDataModel,
+  ) {
     return _performRequest(
       lControllerUrl,
-          () => _genericMultipartRequest(
+      () => _genericMultipartRequest(
         lControllerUrl,
         carDataModel,
         fileExtractors: {
@@ -594,59 +641,67 @@ class HttpsCalls {
     await File(path.join(servicesDir.path, 'shared_preferences_service.dart')).writeAsString('''
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:logger/logger.dart';
+import 'logger_service.dart';
 
+/// Service for managing local storage using SharedPreferences.
 class SharedPreferencesService {
   static const String _keyDataModel = 'data_model';
   static const String _keyUserData = 'user_data';
   static const String _deviceToken = 'deviceToken';
   static const String _apiToken = 'apiToken';
 
-  static final logger = Logger();
-
   Future<void> saveDeviceToken(String token) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_deviceToken, token);
+    LoggerService.i('Saved device token');
   }
 
   Future<String?> readDeviceToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_deviceToken);
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(_deviceToken);
+    LoggerService.d('Read device token: \$token');
+    return token;
   }
 
   Future<void> saveToken(String token) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_apiToken, token);
+    LoggerService.i('Saved API token');
   }
 
   Future<String?> readToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_apiToken);
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(_apiToken);
+    LoggerService.d('Read API token: \$token');
+    return token;
   }
 
   Future<void> saveUserData(dynamic userData) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String data = json.encode(userData.toJson());
+    final prefs = await SharedPreferences.getInstance();
+    final data = json.encode(userData.toJson());
     await prefs.setString(_keyUserData, data);
+    LoggerService.i('Saved user data');
   }
 
   Future<dynamic> readUserData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? data = prefs.getString(_keyUserData);
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString(_keyUserData);
     if (data != null) {
-      Map<String, dynamic> jsonData = json.decode(data);
+      final jsonData = json.decode(data);
+      LoggerService.d('Read user data: \$jsonData');
       return jsonData;
     }
+    LoggerService.d('No user data found');
     return null;
   }
 
   Future<void> clearAllPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool result = await prefs.clear();
+    final prefs = await SharedPreferences.getInstance();
+    final result = await prefs.clear();
     if (result) {
-      logger.i('All SharedPreferences data cleared successfully.');
+      LoggerService.i('All SharedPreferences data cleared successfully');
     } else {
-      logger.e('Failed to clear SharedPreferences data.');
+      LoggerService.e('Failed to clear SharedPreferences data');
     }
   }
 }
@@ -654,32 +709,27 @@ class SharedPreferencesService {
 
     await File(path.join(servicesDir.path, 'json_extractor.dart')).writeAsString('''
 import 'dart:convert';
-import 'package:logger/logger.dart';
 import '../config/global_variables.dart';
+import 'logger_service.dart';
 
+/// Extracts and stores error messages from API responses.
 class MessageExtractor {
-  final Logger _logger = Logger();
-
   void extractAndStoreMessage(String endPoint, String responseBody) {
     try {
-      _logger.i("Api EndPoint: \$endPoint - Body: \$responseBody");
-
-      final Map<String, dynamic> jsonMap = jsonDecode(responseBody);
-
+      LoggerService.i('Api EndPoint: \$endPoint - Body: \$responseBody');
+      final jsonMap = jsonDecode(responseBody);
       GlobalVariables.errorMessages.clear();
-
       if (jsonMap['errors'] is List) {
         GlobalVariables.errorMessages = List<String>.from(jsonMap['errors']);
       } else if (jsonMap['message'] != null) {
         GlobalVariables.errorMessages.add(jsonMap['message']);
       } else {
-        GlobalVariables.errorMessages.add("Unknown error occurred.");
+        GlobalVariables.errorMessages.add('Unknown error occurred.');
       }
-
-      _logger.i("Stored Error Messages: \${GlobalVariables.errorMessages}");
+      LoggerService.i('Stored Error Messages: \${GlobalVariables.errorMessages}');
     } catch (e) {
-      _logger.e('Error extracting and storing message: \$e');
-      GlobalVariables.errorMessages.add("Error extracting message.");
+      LoggerService.e('Error extracting and storing message: \$e');
+      GlobalVariables.errorMessages.add('Error extracting message.');
     }
   }
 }
@@ -688,42 +738,46 @@ class MessageExtractor {
     await File(path.join(servicesDir.path, 'location_service.dart')).writeAsString('''
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'logger_service.dart';
 
+/// Service for retrieving the user's current location.
 class LocationService {
   /// Retrieves the current location of the user.
-  /// Returns a [Position] with latitude & longitude.
+  /// Returns a [Position] with latitude and longitude.
   /// Throws [Exception] with detailed messages on failure.
   Future<Position> getCurrentLocation() async {
     // Step 1: Check if location services are enabled
     final isServiceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!isServiceEnabled) {
+      LoggerService.w('Location services are disabled');
       await Geolocator.openLocationSettings();
       throw Exception('Location services are disabled.');
     }
 
     // Step 2: Check permission status
-    LocationPermission permission = await Geolocator.checkPermission();
-
+    var permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
+      LoggerService.d('Requesting location permission');
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
+        LoggerService.w('Location permission denied');
         throw Exception('Location permission denied.');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
+      LoggerService.w('Location permission permanently denied');
       await openAppSettings();
-      throw Exception(
-        'Location permission permanently denied. Please enable it in app settings.',
-      );
+      throw Exception('Location permission permanently denied. Please enable it in app settings.');
     }
 
     // Step 3: Get current position
     try {
-      return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      LoggerService.i('Location retrieved: \${position.latitude}, \${position.longitude}');
+      return position;
     } catch (e) {
+      LoggerService.e('Error fetching location: \$e');
       throw Exception('Error fetching location: \$e');
     }
   }
@@ -739,13 +793,16 @@ import '../mvvm/model/api_response_model/api_response.dart';
 import 'json_extractor.dart';
 import 'logger_service.dart';
 
+/// Handles API responses with standardized processing.
 class ApiResponseHandler {
+  /// Processes an API response and returns an [ApiResponse<T>].
+  /// Uses [fromJson] to parse the data field into type [T].
   static Future<ApiResponse<T>> process<T>(
-      dynamic response,
-      String? endPoint,
-      T Function(dynamic dataJson) fromJson,
-      ) async {
-    MessageExtractor().extractAndStoreMessage(endPoint ?? "", response.body);
+    dynamic response,
+    String? endPoint,
+    T Function(dynamic dataJson) fromJson,
+  ) async {
+    MessageExtractor().extractAndStoreMessage(endPoint ?? '', response.body);
 
     switch (response.statusCode) {
       case 200:
@@ -753,7 +810,7 @@ class ApiResponseHandler {
         final parsedJson = response.body.length > 100000
             ? await compute<String, dynamic>(_parseJson, response.body)
             : jsonDecode(response.body);
-
+        LoggerService.i('API response processed successfully: \$endPoint');
         return ApiResponse<T>.fromJson(parsedJson, fromJson);
 
       case 401:
@@ -761,20 +818,17 @@ class ApiResponseHandler {
         break;
 
       case 422:
-        _handleError(response, "Validation Error");
+        _handleError(response, 'Validation Error');
         break;
 
       case 500:
-        _handleError(response, "Internal Server Error");
+        _handleError(response, 'Internal Server Error');
         break;
 
       default:
-        _handleError(
-          response,
-          "API Error: \${response.statusCode} - \${response.reasonPhrase}",
-        );
+        _handleError(response, 'API Error: \${response.statusCode} - \${response.reasonPhrase}');
     }
-    throw Exception("Unexpected error occurred.");
+    throw Exception('Unexpected error occurred.');
   }
 
   static dynamic _parseJson(String responseBody) {
@@ -782,15 +836,17 @@ class ApiResponseHandler {
   }
 
   static void _handleUnauthorized() {
-    LoggerService.w("Unauthorized access. Redirecting to login.");
+    LoggerService.w('Unauthorized access. Redirecting to login.');
     Get.offAllNamed(AppRoutes.loginView);
-    throw Exception("Unauthorized access. Please log in.");
+    throw Exception('Unauthorized access. Please log in.');
   }
 
   static void _handleError(dynamic response, String errorMessage) {
     try {
       final errorResponse = jsonDecode(response.body);
-      throw Exception("\$errorMessage: \${errorResponse['message'] ?? 'No details available'}");
+      final message = 'errorMessage: \${errorResponse['message'] ?? 'No details available'}';
+      LoggerService.e(message);
+      throw Exception(message);
     } catch (e, stack) {
       LoggerService.e('Error handling failed: \$e', error: e, stackTrace: stack);
       throw Exception(errorMessage);
@@ -804,20 +860,94 @@ class ApiResponseHandler {
 ''');
 
     await File(path.join(servicesDir.path, 'logger_service.dart')).writeAsString('''
+import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 
+/// Custom log printer with enhanced formatting, colors, and timestamps.
+class CustomPrinter extends LogPrinter {
+  final PrettyPrinter _prettyPrinter;
+
+  CustomPrinter()
+      : _prettyPrinter = PrettyPrinter(
+          methodCount: 2,
+          errorMethodCount: 8,
+          lineLength: 120,
+          colors: true,
+          printEmojis: true,
+          excludeBox: const {},
+          noBoxingByDefault: false,
+          excludePaths: const [],
+          levelColors: {
+            Level.trace: AnsiColor.fg(93), // Electric Purple 💜
+            Level.debug: AnsiColor.fg(200), // Neon Cyan 🌀
+            Level.info: AnsiColor.fg(200), // Bright Cyan 🩵
+            Level.warning: AnsiColor.fg(214), // Vivid Orange ⚠️
+            Level.error: AnsiColor.fg(197), // Bright Crimson ⛔
+            Level.wtf: AnsiColor.fg(200), // Hot Pink 🔥
+          },
+          levelEmojis: {
+            Level.trace: '💜 ',
+            Level.debug: '🌀 ',
+            Level.info: '🩵 ',
+            Level.warning: '⚡ ',
+            Level.error: '⛔ ',
+            Level.wtf: '🔥 ',
+          },
+        );
+
+  @override
+  List<String> log(LogEvent event) {
+    final output = _prettyPrinter.log(event);
+    final dateTime = DateTime.now();
+    final formattedTime = DateFormat('dd-MM-yyyy hh:mm:ss a').format(dateTime);
+    final levelName = event.level.name.toUpperCase();
+    return output.map((line) => '[📅 \$formattedTime] [\$levelName] \$line').toList();
+  }
+}
+
+/// Singleton service for logging with custom formatting.
 class LoggerService {
+  LoggerService._();
+
   static final Logger _logger = Logger(
-    printer: PrettyPrinter(),
+    filter: ProductionFilter(),
+    printer: CustomPrinter(),
+    level: kDebugMode ? Level.trace : Level.warning,
   );
 
-  static void d(String message) => _logger.d(message);
-  static void i(String message) => _logger.i(message);
-  static void w(String message) => _logger.w(message);
-  static void e(String message, {dynamic error, StackTrace? stackTrace}) =>
-      _logger.e(message, error: error, stackTrace: stackTrace);
-  static void v(String message) => _logger.v(message);
-  static void wtf(String message) => _logger.wtf(message);
+  /// Returns the singleton logger instance.
+  static Logger get instance => _logger;
+
+  /// Logs a debug message (only in debug mode).
+  static void d(dynamic message, {Object? error, StackTrace? stackTrace}) {
+    if (kDebugMode) _logger.d(message, error: error, stackTrace: stackTrace);
+  }
+
+  /// Logs an info message (only in debug mode).
+  static void i(dynamic message, {Object? error, StackTrace? stackTrace}) {
+    if (kDebugMode) _logger.i(message, error: error, stackTrace: stackTrace);
+  }
+
+  /// Logs a warning message (only in debug mode).
+  static void w(dynamic message, {Object? error, StackTrace? stackTrace}) {
+    if (kDebugMode) _logger.w(message, error: error, stackTrace: stackTrace);
+  }
+
+  /// Logs an error message (only in debug mode).
+  static void e(dynamic message, {Object? error, StackTrace? stackTrace}) {
+    if (kDebugMode) _logger.e(message, error: error, stackTrace: stackTrace);
+  }
+
+  /// Logs a verbose message (only in debug mode).
+  static void v(dynamic message, {Object? error, StackTrace? stackTrace}) {
+    if (kDebugMode) _logger.v(message, error: error, stackTrace: stackTrace);
+  }
+
+  /// Logs a WTF message (only in debug mode).
+  static void wtf(dynamic message, {Object? error, StackTrace? stackTrace}) {
+    if (kDebugMode) _logger.wtf(message, error: error, stackTrace: stackTrace);
+  }
 }
 ''');
 
@@ -836,13 +966,16 @@ import '../../mvvm/model/body_model/driver_signup_body_model.dart';
 import '../../mvvm/model/body_model/garage_signup_body_model.dart';
 import '../../services/api_response_handler.dart';
 import '../../services/https_calls.dart';
+import '../../services/logger_service.dart';
 
+/// Repository for authentication-related API calls.
 class AuthRepository {
   final HttpsCalls _httpsCalls = HttpsCalls();
 
   Future<ApiResponse<void>> driverSignUpApi(DriverSignupBodyModel signUpBodyModel) async {
     try {
-      String endPoint = AppUrls.signup;
+      const endPoint = AppUrls.signup;
+      LoggerService.d('Initiating driver signup API call');
       final response = await _httpsCalls.multipartDriverProfileApiHits(endPoint, signUpBodyModel);
       return await ApiResponseHandler.process(response, endPoint, (dataJson) {});
     } catch (e, stackTrace) {
@@ -853,7 +986,8 @@ class AuthRepository {
 
   Future<ApiResponse<void>> updateDriver(DriverSignupBodyModel signUpBodyModel) async {
     try {
-      String endPoint = AppUrls.updateAccount;
+      const endPoint = AppUrls.updateAccount;
+      LoggerService.d('Initiating driver update API call');
       final response = await _httpsCalls.multipartDriverProfileApiHits(endPoint, signUpBodyModel);
       return await ApiResponseHandler.process(response, endPoint, (dataJson) {});
     } catch (e, stackTrace) {
@@ -864,7 +998,8 @@ class AuthRepository {
 
   Future<ApiResponse<void>> garageSignUpApi(GarageSignupBodyModel signUpBodyModel) async {
     try {
-      String endPoint = AppUrls.signup;
+      const endPoint = AppUrls.signup;
+      LoggerService.d('Initiating garage signup API call');
       final response = await _httpsCalls.multipartGarageProfileApiHits(endPoint, signUpBodyModel);
       return await ApiResponseHandler.process(response, endPoint, (dataJson) {});
     } catch (e, stackTrace) {
@@ -883,13 +1018,16 @@ import '../../mvvm/model/body_model/add_car_body_model.dart';
 import '../../mvvm/model/body_model/buy_car_request.dart';
 import '../../services/api_response_handler.dart';
 import '../../services/https_calls.dart';
+import '../../services/logger_service.dart';
 
+/// Repository for data-related API calls (e.g., car operations).
 class DataRepository {
   final HttpsCalls _httpsCalls = HttpsCalls();
 
   Future<ApiResponse<void>> addCarApi(AddCarBodyModel carDataModel) async {
     try {
-      String endPoint = AppUrls.signup; // Update with correct endpoint
+      const endPoint = AppUrls.signup; // TODO: Update with correct endpoint
+      LoggerService.d('Initiating add car API call');
       final response = await _httpsCalls.crudCarMultipartApi(endPoint, carDataModel);
       return await ApiResponseHandler.process(response, endPoint, (dataJson) {});
     } catch (e, stackTrace) {
@@ -900,7 +1038,8 @@ class DataRepository {
 
   Future<ApiResponse<void>> buyCarApi(BuyCarRequestModel buyRequestModel) async {
     try {
-      String endPoint = AppUrls.signup; // Update with correct endpoint
+      const endPoint = AppUrls.signup; // TODO: Update with correct endpoint
+      LoggerService.d('Initiating buy car API call');
       final response = await _httpsCalls.multipartBuyCarRequestApi(endPoint, buyRequestModel);
       return await ApiResponseHandler.process(response, endPoint, (dataJson) {});
     } catch (e, stackTrace) {
@@ -923,6 +1062,7 @@ import 'package:get/get.dart';
 import 'config/app_colors.dart';
 import 'config/app_routes.dart';
 
+/// Root widget for the LayerX app with GetX and responsive design.
 class LayerXApp extends StatelessWidget {
   const LayerXApp({super.key});
 
@@ -954,7 +1094,7 @@ class LayerXApp extends StatelessWidget {
 
   Future<void> _updateMainFile(String projectPath) async {
     final mainFile = File(path.join(projectPath, 'lib', 'main.dart'));
-    await mainFile.writeAsString('''
+    await File(mainFile.path).writeAsString('''
 import 'package:flutter/material.dart';
 import 'app/app_widget.dart';
 
@@ -974,23 +1114,25 @@ description: A Flutter project with LayerX architecture.
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  get: ^4.6.5
-  http: ^1.0.0
-  shared_preferences: ^2.0.0
-  logger: ^2.0.0
-  flutter_screenutil: ^5.0.0
-  geolocator: ^10.0.0
-  permission_handler: ^10.0.0
+  get: ^4.6.6
+  http: ^1.2.2
+  shared_preferences: ^2.3.0
+  logger: ^2.4.0
+  flutter_screenutil: ^5.9.3
+  geolocator: ^13.0.1
+  permission_handler: ^11.3.3
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: ^2.0.0
+  lints: ^5.0.0
+  build_runner: ^2.4.13
 
 flutter:
   uses-material-design: true
