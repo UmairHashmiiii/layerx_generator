@@ -164,11 +164,27 @@ class AppAssets {
 import 'package:flutter/material.dart';
 
 /// Defines color constants for the LayerX app.
+
 abstract class AppColors {
   AppColors._();
-  static const Color primary = Color(0xFF24B986);
-  static const Color getStartedBg = Color(0xFF874070);
-  static const Color blueColor = Color(0xFF3DDED0);
+
+  static const Color primary = Color(0xff2D9BFF);
+  static const Color secondaryWhite = Color(0xffFFFFFF);
+  static const Color secondaryBlack = Color(0xff1B1C1E);
+  static Color lightBgButtonColor = Color(0xfff5f5f5).withOpacity(0.05);
+  static const Color white = Color(0xffffffff);
+  static const Color black = Color(0xff000000);
+  static const Color positiveGreen = Color(0xff21D575);
+  static const Color textDarkColor = Color(0xff1B0036);
+  static const Color negativeRed = Color(0xffEA4334);
+  static const Color transparent = Colors.transparent;
+  static const Color textLightBlack = Color(0xff777E90);
+  static const Color bgColor = Color(0xFFF0F1F6);
+  static const Color darkBgColor = Color(0xFF1B1C1E);
+  static const Color borderColor = Color(0xFFE6E7E9);
+  static const Color borderGrey = Color(0xFFD7DDE5);
+  static const Color lightTextColor = Color(0xFF777E90);
+
 }
 ''');
 
@@ -181,23 +197,191 @@ enum UserRole { USER, BUSINESS }
 /// Defines navigation routes for the LayerX app.
 abstract class AppRoutes {
   AppRoutes._();
+
   static const splashView = '/splashView';
-  static const signInView = '/signInView';
-  static const loginView = '/loginView';
+  static const garageMaintenanceRecordView = '/garageMaintenanceRecordView';
+ 
 }
-''');
 
-    await File(path.join(configDir.path, 'app_pages.dart')).writeAsString('''
-import 'package:get/get.dart';
-
-/// Configures GetX routes for the LayerX app.
 abstract class AppPages {
   AppPages._();
+
   static final routes = <GetPage>[
-    // Example route:
-    // GetPage(name: AppRoutes.splashView, page: () => const SplashView()),
+    GetPage(
+      name: AppRoutes.splashView,
+      page: () => SplashView(),
+      binding: BindingsBuilder(() {
+        // Get.lazyPut<GetStartedController>(() => GetStartedController());
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.garageMaintenanceRecordView,
+      page: () => ImageViewerScreen(),
+    ),
+
+   
   ];
 }
+
+''');
+
+    await File(path.join(configDir.path, 'app_theme.dart')).writeAsString('''
+/// Defines navigation routes for the LayerX app.
+
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'app_colors.dart';
+
+abstract class AppTheme {
+  static const _primaryColor = AppColors.primary;
+  static const _secondaryColor = AppColors.secondaryWhite;
+  static const _borderRadius = 12.0;
+  static const _buttonPadding = EdgeInsets.symmetric(vertical: 12, horizontal: 20);
+
+  // Container colors for light and dark themes
+  static const Color _lightContainerColor = AppColors.secondaryWhite; // For light theme containers
+  static const Color _darkContainerColor = AppColors.darkBgColor; // For dark theme containers
+
+  static const Color _lightScaffoldColor = AppColors.secondaryWhite;
+  static const Color _darkScaffoldColor = Color(0xff1B1C1E);
+
+  static final ThemeData lightTheme = ThemeData(
+    fontFamily: "Poppins",
+    
+    brightness: Brightness.light,
+    primaryColor: _primaryColor,
+    scaffoldBackgroundColor: _lightScaffoldColor,
+    colorScheme: ColorScheme.light(primary: _primaryColor, secondary: _secondaryColor),
+    appBarTheme: _appBarTheme(_primaryColor, AppColors.textDarkColor),
+    // textTheme: _lightTextTheme,
+    cardColor: _lightContainerColor, // Light theme container color
+      elevatedButtonTheme: _elevatedButtonTheme(Brightness.light),
+    inputDecorationTheme: _inputDecorationTheme(AppColors.secondaryBlack, AppColors.textLightBlack),
+    iconTheme: IconThemeData(color: _primaryColor),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: _primaryColor, foregroundColor: AppColors.secondaryWhite),
+    bottomNavigationBarTheme: _bottomNavigationBarTheme(AppColors.bgColor, _primaryColor, AppColors.textDarkColor),
+    cardTheme: _cardTheme(_lightContainerColor, AppColors.borderGrey), // Light theme card color
+    switchTheme: _switchTheme(_primaryColor),
+    checkboxTheme: _checkboxTheme(_primaryColor),
+    sliderTheme: _sliderTheme(_primaryColor),
+    tabBarTheme: _tabBarTheme(_primaryColor, AppColors.textDarkColor),
+    progressIndicatorTheme: ProgressIndicatorThemeData(color: _primaryColor),
+    dividerTheme: DividerThemeData(color: AppColors.textLightBlack, thickness: 1),
+    tooltipTheme: TooltipThemeData(decoration: BoxDecoration(color: _primaryColor, borderRadius: BorderRadius.circular(_borderRadius))),
+    popupMenuTheme: PopupMenuThemeData(color: AppColors.secondaryWhite, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_borderRadius))),
+  );
+
+  static final ThemeData darkTheme = ThemeData(
+    fontFamily: "Poppins",
+    brightness: Brightness.dark,
+    primaryColor: _primaryColor,
+    scaffoldBackgroundColor: _darkScaffoldColor,
+    colorScheme: ColorScheme.dark(primary: _primaryColor, secondary: _secondaryColor),
+    appBarTheme: _appBarTheme(AppColors.secondaryBlack, AppColors.secondaryWhite),
+    // textTheme: _darkTextTheme,
+    cardColor: _darkContainerColor, // Dark theme container color
+    elevatedButtonTheme: _elevatedButtonTheme(Brightness.dark),
+    inputDecorationTheme: _inputDecorationTheme(AppColors.secondaryBlack, AppColors.textLightBlack),
+    iconTheme: IconThemeData(color: AppColors.secondaryWhite),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: _primaryColor, foregroundColor: AppColors.secondaryWhite),
+    bottomNavigationBarTheme: _bottomNavigationBarTheme(AppColors.secondaryBlack, _primaryColor, AppColors.secondaryWhite),
+    cardTheme: _cardTheme(_darkContainerColor, AppColors.textLightBlack), // Dark theme card color
+    switchTheme: _switchTheme(_primaryColor),
+    checkboxTheme: _checkboxTheme(_primaryColor),
+    sliderTheme: _sliderTheme(_primaryColor),
+    tabBarTheme: _tabBarTheme(_primaryColor, AppColors.secondaryWhite),
+    progressIndicatorTheme: ProgressIndicatorThemeData(color: _primaryColor),
+    dividerTheme: DividerThemeData(color: AppColors.textLightBlack, thickness: 1),
+    tooltipTheme: TooltipThemeData(decoration: BoxDecoration(color: _primaryColor, borderRadius: BorderRadius.circular(_borderRadius))),
+    popupMenuTheme: PopupMenuThemeData(color: AppColors.secondaryBlack, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_borderRadius))),
+  );
+
+
+  static AppBarTheme _appBarTheme(Color bgColor, Color fgColor) => AppBarTheme(
+    backgroundColor: bgColor,
+    foregroundColor: fgColor,
+    elevation: 3,
+    titleTextStyle: GoogleFonts.poppins(fontSize: 20.sp, fontWeight: FontWeight.bold, color: fgColor),
+  );
+
+  static BottomNavigationBarThemeData _bottomNavigationBarTheme(Color bgColor, Color selected, Color unselected) => BottomNavigationBarThemeData(
+    backgroundColor: bgColor,
+    selectedItemColor: selected,
+    unselectedItemColor: unselected,
+  );
+
+  static final TextTheme _lightTextTheme = TextTheme(
+    displayLarge: GoogleFonts.poppins(fontSize: 24.sp, fontWeight: FontWeight.bold, color: AppColors.textDarkColor),
+    displayMedium: GoogleFonts.poppins(fontSize: 22.sp, fontWeight: FontWeight.normal, color: AppColors.textDarkColor),
+    bodyLarge: GoogleFonts.poppins(fontSize: 16.sp, fontWeight: FontWeight.normal, color: AppColors.textDarkColor),
+    bodyMedium: GoogleFonts.poppins(fontSize: 14.sp, color: AppColors.textLightBlack),
+  );
+
+
+
+  static final TextTheme _darkTextTheme = TextTheme(
+    displayLarge: GoogleFonts.poppins(fontSize: 24.sp, fontWeight: FontWeight.bold, color: AppColors.secondaryWhite),
+    displayMedium: GoogleFonts.poppins(fontSize: 22.sp, fontWeight: FontWeight.normal, color: AppColors.secondaryWhite),
+    bodyLarge: GoogleFonts.poppins(fontSize: 16.sp, fontWeight: FontWeight.normal, color: AppColors.secondaryWhite),
+    bodyMedium: GoogleFonts.poppins(fontSize: 14.sp, color: AppColors.textLightBlack),
+  );
+
+  static ElevatedButtonThemeData _elevatedButtonTheme(Brightness brightness) {
+    return ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: brightness == Brightness.dark ? AppColors.borderGrey : _primaryColor,
+        foregroundColor: AppColors.secondaryWhite,
+        textStyle: GoogleFonts.poppins(fontSize: 16.sp, fontWeight: FontWeight.w600),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_borderRadius)),
+        padding: _buttonPadding,
+      ),
+    );
+  }
+
+  static InputDecorationTheme _inputDecorationTheme(Color fillColor, Color hintColor) => InputDecorationTheme(
+    filled: true,
+    fillColor: fillColor,
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(_borderRadius)),
+    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: _primaryColor, width: 2), borderRadius: BorderRadius.circular(_borderRadius)),
+    hintStyle: GoogleFonts.poppins(color: hintColor),
+  );
+
+  static CardTheme _cardTheme(Color bgColor, Color shadowColor) => CardTheme(
+    color: bgColor,
+    shadowColor: shadowColor,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_borderRadius)),
+    elevation: 4,
+  );
+
+  static SwitchThemeData _switchTheme(Color activeColor) => SwitchThemeData(
+    trackColor: MaterialStateProperty.resolveWith<Color>((states) => states.contains(MaterialState.selected) ? activeColor : Colors.grey),
+    thumbColor: MaterialStateProperty.all(AppColors.secondaryWhite),
+  );
+
+  static CheckboxThemeData _checkboxTheme(Color activeColor) => CheckboxThemeData(
+    checkColor: MaterialStateProperty.all(AppColors.secondaryWhite),
+    fillColor: MaterialStateProperty.all(activeColor),
+  );
+
+  static SliderThemeData _sliderTheme(Color activeColor) => SliderThemeData(
+    activeTrackColor: activeColor,
+    inactiveTrackColor: activeColor.withOpacity(0.5),
+    thumbColor: activeColor,
+    overlayColor: activeColor.withOpacity(0.2),
+    valueIndicatorColor: activeColor,
+  );
+
+  static TabBarTheme _tabBarTheme(Color indicatorColor, Color labelColor) => TabBarTheme(
+    indicator: BoxDecoration(border: Border(bottom: BorderSide(color: indicatorColor, width: 2))),
+    labelColor: labelColor,
+    unselectedLabelColor: AppColors.textLightBlack,
+  );
+}
+
+
+
 ''');
 
     await File(path.join(configDir.path, 'app_strings.dart')).writeAsString('''
@@ -221,36 +405,452 @@ abstract class AppUrls {
 
     await File(path.join(configDir.path, 'app_text_style.dart')).writeAsString('''
 import 'package:flutter/material.dart';
-
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 /// Defines text styles for the LayerX app.
 abstract class AppTextStyles {
-  AppTiles._();
-  static TextStyle bodyText({Color? color}) {
-    return TextStyle(fontSize: 16, color: color ?? Colors.black);
+  AppTextStyles._();
+
+  static TextStyle customText({
+    Color? color,
+    Paint? foreground,
+    FontWeight fontWeight = FontWeight.normal,
+    double letterSpacing = 0,
+    double fontSize = 12,
+    double? height,
+  }) {
+    // Using Get.textTheme.displayMedium everywhere
+    return Get.textTheme.displayMedium!.copyWith(
+      fontSize: fontSize.sp,
+      color: color,
+      foreground: foreground,
+      fontWeight: fontWeight,
+      letterSpacing: letterSpacing,
+      height: height,
+    );
+  }
+  static TextStyle customTextLexend({
+    Color? color,
+    double? height,
+    FontWeight fontWeight = FontWeight.normal,
+    double letterSpacing = 0,
+    double? fontSize,
+    TextDecoration decoration = TextDecoration.none,
+    Color? decorationColor,
+  }) {
+    return GoogleFonts.lexend(
+        fontSize: fontSize ?? 14.sp, fontWeight: fontWeight, color: color, letterSpacing: letterSpacing, decoration: decoration, height: height, decorationColor: decorationColor);
+  }
+  static TextStyle customText10({
+    Color? color,
+    FontWeight fontWeight = FontWeight.normal,
+    double letterSpacing = 0,
+    double? height,
+  }) {
+    return Get.textTheme.displayMedium!.copyWith(
+      fontSize: 10.sp,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
+      height: height,
+    );
+  }
+
+  static TextStyle customText12({
+    Color? color,
+    FontWeight fontWeight = FontWeight.normal,
+    double letterSpacing = 0,
+    double? height,
+  }) {
+    return Get.textTheme.displayMedium!.copyWith(
+      fontSize: 12.sp,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
+      height: height,
+    );
+  }
+
+  static TextStyle customText14({
+    Color? color,
+    double? height,
+    FontWeight fontWeight = FontWeight.normal,
+    double letterSpacing = 0,
+    TextDecoration decoration = TextDecoration.none,
+    Color? decorationColor,
+  }) {
+    return Get.textTheme.displayMedium!.copyWith(
+      fontSize: 14.sp,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
+      decoration: decoration,
+      height: height,
+      decorationColor: decorationColor,
+    );
+  }
+
+  static TextStyle customText16({
+    Color? color,
+    FontWeight fontWeight = FontWeight.normal,
+    double letterSpacing = 0,
+    double? height,
+    TextDecoration decoration = TextDecoration.none,
+    Color? decorationColor,
+  }) {
+    return Get.textTheme.displayMedium!.copyWith(
+      fontSize: 16.sp,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
+      decoration: decoration,
+      decorationColor: decorationColor,
+      height: height,
+    );
+  }
+
+  static TextStyle customText32({
+    Color? color,
+    FontWeight fontWeight = FontWeight.normal,
+    double letterSpacing = 0,
+    TextDecoration decoration = TextDecoration.none,
+    double? height,
+  }) {
+    return Get.textTheme.displayMedium!.copyWith(
+      fontSize: 32.sp,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
+      decoration: decoration,
+      height: height,
+    );
+  }
+
+  static TextStyle customText38({
+    Color? color,
+    FontWeight fontWeight = FontWeight.normal,
+    double letterSpacing = 0,
+    TextDecoration decoration = TextDecoration.none,
+    double? height,
+  }) {
+    return Get.textTheme.displayMedium!.copyWith(
+      fontSize: 38.sp,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
+      decoration: decoration,
+      height: height,
+    );
+  }
+
+  static TextStyle customText18({
+    Color? color,
+    FontWeight fontWeight = FontWeight.normal,
+    double letterSpacing = 0,
+    double? height,
+  }) {
+    return Get.textTheme.displayMedium!.copyWith(
+      fontSize: 18.sp,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
+      height: height,
+    );
+  }
+
+  static TextStyle customText20({
+    Color? color,
+    double? height,
+    FontWeight fontWeight = FontWeight.normal,
+    double letterSpacing = 0,
+  }) {
+    return Get.textTheme.displayMedium!.copyWith(
+      fontSize: 20.sp,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
+      height: height,
+    );
+  }
+
+  static TextStyle customText22({
+    Color? color,
+    FontWeight fontWeight = FontWeight.normal,
+    double letterSpacing = 0,
+    double? height,
+  }) {
+    return Get.textTheme.displayMedium!.copyWith(
+      fontSize: 22.sp,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
+      height: height,
+    );
+  }
+
+  static TextStyle customText24({
+    double? height,
+    Color? color,
+    FontWeight fontWeight = FontWeight.normal,
+    double letterSpacing = 0,
+  }) {
+    return Get.textTheme.displayMedium!.copyWith(
+      fontSize: 24.sp,
+      height: height,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
+    );
+  }
+
+  static TextStyle customText26({
+    Color? color,
+    double? height,
+    FontWeight fontWeight = FontWeight.normal,
+    double letterSpacing = 0,
+  }) {
+    return Get.textTheme.displayMedium!.copyWith(
+      fontSize: 26.sp,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
+      height: height,
+    );
+  }
+
+  static TextStyle customText28({
+    Color? color,
+    double? height,
+    FontWeight fontWeight = FontWeight.normal,
+    double letterSpacing = 0,
+  }) {
+    return Get.textTheme.displayMedium!.copyWith(
+      fontSize: 28.sp,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
+      height: height,
+    );
+  }
+
+  static TextStyle customTextPoppins({
+    Color? color,
+    double? fontSize,
+    FontWeight fontWeight = FontWeight.normal,
+    double letterSpacing = 0,
+  }) {
+    return GoogleFonts.poppins(
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      color: color,
+      letterSpacing: letterSpacing,
+    );
   }
 }
-''');
 
-    await File(path.join(configDir.path, 'global_variable.dart')).writeAsString('''
-/// Stores global variables for the LayerX app.
-class GlobalVariables {
-  static List<String> errorMessages = [];
-}
 ''');
 
     await File(path.join(configDir.path, 'padding_extensions.dart')).writeAsString('''
 import 'package:flutter/material.dart';
 
 /// Adds padding extensions for widgets in the LayerX app.
-extension PaddingExtension on Widget {
-  Widget paddingAll(double padding) => Padding(padding: EdgeInsets.all(padding), child: this);
+extension PaddingExtension on Widget{
+
+  Widget paddingFromAll(double padding){
+    return Padding(
+      padding: EdgeInsets.all(padding),
+      child: this,
+    );
+  }
+  Widget paddingHorizontal(double padding) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: padding),
+      child: this,
+    );
+
+  }
+  Widget paddingVertical(double padding){
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: padding),
+      child: this,
+    );
+  }
+  Widget paddingRight(double padding) {
+    return Padding(
+      padding: EdgeInsets.only(right: padding),
+      child: this,
+    );
+  }
+  Widget paddingLeft(double padding) {
+    return Padding(
+      padding: EdgeInsets.only(left: padding),
+      child: this,
+    );
+  }
+  Widget paddingTop(double padding) {
+    return Padding(
+      padding: EdgeInsets.only(top: padding),
+      child: this,
+    );
+  }
+  Widget paddingBottom(double padding) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: padding),
+      child: this,
+    );
+  }
 }
 ''');
 
     await File(path.join(configDir.path, 'utils.dart')).writeAsString('''
 /// Provides utility functions for the LayerX app.
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
+
+
 class Utils {
-  static String formatDate(DateTime date) => date.toIso8601String();
+
+  static String formatDate(DateTime? date) {
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    return formatter.format(date ?? DateTime.now());
+  }
+  static String formatDateDMY(DateTime? date) {
+    final DateFormat formatter = DateFormat('dd-MM-yyyy');
+    return formatter.format(date ?? DateTime.now());
+  }
+  static  calculateAge(DateTime birthDate) {
+    DateTime today = DateTime.now();
+    int age = today.year - birthDate.year;
+
+    if (today.month < birthDate.month ||
+        (today.month == birthDate.month && today.day < birthDate.day)) {
+      age--;
+    }
+    return age;
+  }
+  static String? formatDateTime(DateTime? date) {
+    if (date == null) return null;
+    return DateFormat('MMM d, h:mm a').format(date); // e.g., Apr 18, 3:45 PM
+  }
+
+  static bool isNotExpired(String date) {
+    try {
+      final cleanedDate = date
+          .replaceAll(RegExp(r'\s+'), '')   // Remove all spaces
+          .replaceAll(RegExp(r'[./]'), '-') // Replace '/' and '.' with '-'
+
+      // Make sure the cleaned format looks like 'yyyy-MM-dd'
+          .trim();
+
+      final DateTime inputDate = DateTime.parse(cleanedDate);
+
+      final DateTime today = DateTime.now();
+      final DateTime currentDate = DateTime(today.year, today.month, today.day);
+
+      return inputDate.isAfter(currentDate) || inputDate.isAtSameMomentAs(currentDate);
+    } catch (e) {
+      LoggerService.i("Invalid date format or error parsing date: e");
+      return false;
+    }
+  }
+
+
+
+
+
+  static void showBottomSheet({required BuildContext context, required Widget child}) {
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topRight: Radius.circular(14.sp), topLeft: Radius.circular(14.sp))),
+      context: context,
+      builder: (context) {
+        return Container(
+          width: ScreenUtil().screenWidth,
+          child: child,
+        );
+      },
+    );
+  }
+
+  static void showCustomDialog({required BuildContext context, required Widget child}) {
+    showDialog(
+      context: context,
+      barrierDismissible: true, // Allows dismissing when tapping outside
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22.sp), // Rounded corners for the dialog
+          ),
+          child: child, // Your custom widget inside the dialog
+        );
+      },
+    );
+  }
+
+
+  static Future<void> showPickImageOptionsDialog(
+      BuildContext context, {
+        required VoidCallback onCameraTap,
+        required VoidCallback onGalleryTap,
+        VoidCallback? onFileTap, // <-- made nullable
+        bool? hasFile, // <-- nullable param
+      }) async {
+    await showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        actions: [
+          CupertinoActionSheetAction(
+            onPressed: onCameraTap,
+            child: const Text("Camera"),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: onGalleryTap,
+            child: const Text("Gallery"),
+          ),
+          if (hasFile == true && onFileTap != null) // <-- safe null check
+            CupertinoActionSheetAction(
+              onPressed: onFileTap,
+              child: const Text("Pick File (PDF, DOC)"),
+            ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text("Cancel"),
+        ),
+      ),
+    );
+  }
+
+
+
+  static showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }
 ''');
 
@@ -326,32 +926,6 @@ class AddCarBodyModel {
 }
 ''');
 
-    await File(path.join(bodyModelDir.path, 'buy_car_request.dart')).writeAsString('''
-/// Model for car purchase request data with multipart support.
-class BuyCarRequestModel {
-  String? carId;
-  File? image;
-
-  BuyCarRequestModel({this.carId, this.image});
-
-  Map<String, dynamic> toJson() => {
-        'car_id': carId,
-      };
-}
-''');
-
-    await File(path.join(responseModelDir.path, 'example_response_model.dart')).writeAsString('''
-/// Example response model for API data.
-class ExampleResponseModel {
-  String? field;
-
-  ExampleResponseModel({this.field});
-
-  factory ExampleResponseModel.fromJson(Map<String, dynamic> json) {
-    return ExampleResponseModel(field: json['field'] as String?);
-  }
-}
-''');
 
     await File(path.join(apiResponseModelDir.path, 'api_response.dart')).writeAsString('''
 /// Generic API response model for flexible data parsing.
