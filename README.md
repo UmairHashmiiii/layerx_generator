@@ -20,7 +20,7 @@ Add the package to your project by updating `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  layerx_generator: ^1.0.2
+  layerx_generator: ^1.1.11
 ```
 
 Run:

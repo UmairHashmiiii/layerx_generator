@@ -18,7 +18,7 @@
 /// Add `layerx_generator` as a dev dependency in your `pubspec.yaml`:
 /// ```yaml
 /// dev_dependencies:
-///   layerx_generator: ^1.0.5
+///   layerx_generator: ^1.1.11
 /// ```
 /// Run:
 /// ```bash
@@ -298,7 +298,6 @@ abstract class AppTheme {
     popupMenuTheme: PopupMenuThemeData(color: AppColors.secondaryBlack, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_borderRadius))),
   );
 
-
   static AppBarTheme _appBarTheme(Color bgColor, Color fgColor) => AppBarTheme(
     backgroundColor: bgColor,
     foregroundColor: fgColor,
@@ -318,8 +317,6 @@ abstract class AppTheme {
     bodyLarge: GoogleFonts.poppins(fontSize: 16.sp, fontWeight: FontWeight.normal, color: AppColors.textDarkColor),
     bodyMedium: GoogleFonts.poppins(fontSize: 14.sp, color: AppColors.textLightBlack),
   );
-
-
 
   static final TextTheme _darkTextTheme = TextTheme(
     displayLarge: GoogleFonts.poppins(fontSize: 24.sp, fontWeight: FontWeight.bold, color: AppColors.secondaryWhite),
@@ -379,9 +376,6 @@ abstract class AppTheme {
     unselectedLabelColor: AppColors.textLightBlack,
   );
 }
-
-
-
 ''');
 
     await File(path.join(configDir.path, 'app_strings.dart')).writeAsString('''
@@ -403,12 +397,13 @@ abstract class AppUrls {
 }
 ''');
 
-    await File(path.join(configDir.path, 'app_text_style.dart')).writeAsString('''
-import 'package:flutter/material.dart';
+    await File(path.join(configDir.path, 'app_text_style.dart'))
+        .writeAsString('''
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 /// Defines text styles for the LayerX app.
 abstract class AppTextStyles {
   AppTextStyles._();
@@ -431,6 +426,7 @@ abstract class AppTextStyles {
       height: height,
     );
   }
+
   static TextStyle customTextLexend({
     Color? color,
     double? height,
@@ -441,8 +437,15 @@ abstract class AppTextStyles {
     Color? decorationColor,
   }) {
     return GoogleFonts.lexend(
-        fontSize: fontSize ?? 14.sp, fontWeight: fontWeight, color: color, letterSpacing: letterSpacing, decoration: decoration, height: height, decorationColor: decorationColor);
+        fontSize: fontSize ?? 14.sp,
+        fontWeight: fontWeight,
+        color: color,
+        letterSpacing: letterSpacing,
+        decoration: decoration,
+        height: height,
+        decorationColor: decorationColor);
   }
+
   static TextStyle customText10({
     Color? color,
     FontWeight fontWeight = FontWeight.normal,
@@ -649,52 +652,57 @@ abstract class AppTextStyles {
     );
   }
 }
-
 ''');
 
-    await File(path.join(configDir.path, 'padding_extensions.dart')).writeAsString('''
+    await File(path.join(configDir.path, 'padding_extensions.dart'))
+        .writeAsString('''
 import 'package:flutter/material.dart';
 
 /// Adds padding extensions for widgets in the LayerX app.
-extension PaddingExtension on Widget{
+extension PaddingExtension on Widget {
 
-  Widget paddingFromAll(double padding){
+  Widget paddingFromAll(double padding) {
     return Padding(
       padding: EdgeInsets.all(padding),
       child: this,
     );
   }
+
   Widget paddingHorizontal(double padding) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: padding),
       child: this,
     );
-
   }
-  Widget paddingVertical(double padding){
+
+  Widget paddingVertical(double padding) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: padding),
       child: this,
     );
   }
+
   Widget paddingRight(double padding) {
     return Padding(
       padding: EdgeInsets.only(right: padding),
       child: this,
     );
   }
+
   Widget paddingLeft(double padding) {
     return Padding(
       padding: EdgeInsets.only(left: padding),
       child: this,
     );
   }
+
   Widget paddingTop(double padding) {
     return Padding(
       padding: EdgeInsets.only(top: padding),
       child: this,
     );
   }
+
   Widget paddingBottom(double padding) {
     return Padding(
       padding: EdgeInsets.only(bottom: padding),
@@ -711,18 +719,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
-
 class Utils {
-
   static String formatDate(DateTime? date) {
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
     return formatter.format(date ?? DateTime.now());
   }
+
   static String formatDateDMY(DateTime? date) {
     final DateFormat formatter = DateFormat('dd-MM-yyyy');
     return formatter.format(date ?? DateTime.now());
   }
-  static  calculateAge(DateTime birthDate) {
+
+  static calculateAge(DateTime birthDate) {
     DateTime today = DateTime.now();
     int age = today.year - birthDate.year;
 
@@ -732,6 +740,7 @@ class Utils {
     }
     return age;
   }
+
   static String? formatDateTime(DateTime? date) {
     if (date == null) return null;
     return DateFormat('MMM d, h:mm a').format(date); // e.g., Apr 18, 3:45 PM
@@ -740,10 +749,8 @@ class Utils {
   static bool isNotExpired(String date) {
     try {
       final cleanedDate = date
-          .replaceAll(RegExp(r'\s+'), '')   // Remove all spaces
+          .replaceAll(RegExp(r'\s+'), '') // Remove all spaces
           .replaceAll(RegExp(r'[./]'), '-') // Replace '/' and '.' with '-'
-
-      // Make sure the cleaned format looks like 'yyyy-MM-dd'
           .trim();
 
       final DateTime inputDate = DateTime.parse(cleanedDate);
@@ -751,22 +758,23 @@ class Utils {
       final DateTime today = DateTime.now();
       final DateTime currentDate = DateTime(today.year, today.month, today.day);
 
-      return inputDate.isAfter(currentDate) || inputDate.isAtSameMomentAs(currentDate);
+      return inputDate.isAfter(currentDate) ||
+          inputDate.isAtSameMomentAs(currentDate);
     } catch (e) {
       LoggerService.i("Invalid date format or error parsing date: e");
       return false;
     }
   }
 
-
-
-
-
-  static void showBottomSheet({required BuildContext context, required Widget child}) {
+  static void showBottomSheet(
+      {required BuildContext context, required Widget child}) {
     showModalBottomSheet(
       backgroundColor: Colors.white,
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(topRight: Radius.circular(14.sp), topLeft: Radius.circular(14.sp))),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topRight: Radius.circular(14.sp),
+              topLeft: Radius.circular(14.sp))),
       context: context,
       builder: (context) {
         return Container(
@@ -777,7 +785,8 @@ class Utils {
     );
   }
 
-  static void showCustomDialog({required BuildContext context, required Widget child}) {
+  static void showCustomDialog(
+      {required BuildContext context, required Widget child}) {
     showDialog(
       context: context,
       barrierDismissible: true, // Allows dismissing when tapping outside
@@ -793,14 +802,13 @@ class Utils {
     );
   }
 
-
   static Future<void> showPickImageOptionsDialog(
-      BuildContext context, {
-        required VoidCallback onCameraTap,
-        required VoidCallback onGalleryTap,
-        VoidCallback? onFileTap, // <-- made nullable
-        bool? hasFile, // <-- nullable param
-      }) async {
+    BuildContext context, {
+    required VoidCallback onCameraTap,
+    required VoidCallback onGalleryTap,
+    VoidCallback? onFileTap, // <-- made nullable
+    bool? hasFile, // <-- nullable param
+  }) async {
     await showCupertinoModalPopup(
       context: context,
       builder: (context) => CupertinoActionSheet(
@@ -829,8 +837,6 @@ class Utils {
     );
   }
 
-
-
   static showErrorDialog(BuildContext context, String message) {
     showDialog(
       context: context,
@@ -850,7 +856,6 @@ class Utils {
       },
     );
   }
-
 }
 ''');
 
@@ -865,11 +870,13 @@ class AppConfig {
   }
 
   Future<void> _createModelFiles(String appDirPath) async {
-    final bodyModelDir = Directory(path.join(appDirPath, 'mvvm', 'model', 'body_model'));
-    final responseModelDir = Directory(path.join(appDirPath, 'mvvm', 'model', 'response_model'));
-    final apiResponseModelDir = Directory(path.join(appDirPath, 'mvvm', 'model', 'api_response_model'));
+    final bodyModelDir =
+        Directory(path.join(appDirPath, 'mvvm', 'model', 'body_model'));
+    final apiResponseModelDir =
+        Directory(path.join(appDirPath, 'mvvm', 'model', 'api_response_model'));
 
-    await File(path.join(bodyModelDir.path, 'driver_signup_body_model.dart')).writeAsString('''
+    await File(path.join(bodyModelDir.path, 'driver_signup_body_model.dart'))
+        .writeAsString('''
 /// Model for driver signup data with multipart support.
 class DriverSignupBodyModel {
   String? name;
@@ -887,7 +894,8 @@ class DriverSignupBodyModel {
 }
 ''');
 
-    await File(path.join(bodyModelDir.path, 'garage_signup_body_model.dart')).writeAsString('''
+    await File(path.join(bodyModelDir.path, 'garage_signup_body_model.dart'))
+        .writeAsString('''
 /// Model for garage signup data with multipart support.
 class GarageSignupBodyModel {
   String? name;
@@ -901,7 +909,23 @@ class GarageSignupBodyModel {
 }
 ''');
 
-    await File(path.join(bodyModelDir.path, 'add_car_body_model.dart')).writeAsString('''
+    await File(path.join(bodyModelDir.path, 'buyCar_request_model.dart'))
+        .writeAsString('''
+/// Model for garage signup data with multipart support.
+class BuyCarRequestModel {
+  String? name;
+  File? image;
+
+  BuyCarRequestModel({this.name, this.image});
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+      };
+}
+''');
+
+    await File(path.join(bodyModelDir.path, 'add_car_body_model.dart'))
+        .writeAsString('''
 /// Model for adding car data with multipart support.
 class AddCarBodyModel {
   String? model;
@@ -926,8 +950,8 @@ class AddCarBodyModel {
 }
 ''');
 
-
-    await File(path.join(apiResponseModelDir.path, 'api_response.dart')).writeAsString('''
+    await File(path.join(apiResponseModelDir.path, 'api_response.dart'))
+        .writeAsString('''
 /// Generic API response model for flexible data parsing.
 class ApiResponse<T> {
   final bool? success;
@@ -996,7 +1020,8 @@ class ApiResponse<T> {
   Future<void> _createServiceFiles(String appDirPath) async {
     final servicesDir = Directory(path.join(appDirPath, 'services'));
 
-    await File(path.join(servicesDir.path, 'https_calls.dart')).writeAsString('''
+    await File(path.join(servicesDir.path, 'https_calls.dart'))
+        .writeAsString('''
 import 'dart:async';
 import 'dart:io';
 import 'package:http/http.dart' as http;
@@ -1042,8 +1067,12 @@ class HttpsCalls {
       } catch (e, stackTrace) {
         if (retryCount == _maxRetries) {
           _ongoingRequests.remove(key);
-          LoggerService.e('Request failed after \$_maxRetries retries: \$e', error: e, stackTrace: stackTrace);
-          throw Exception('Request failed after \$_maxRetries retries: \$e\\n\$stackTrace');
+          LoggerService.e(
+              'Request failed after \$_maxRetries retries: \$e',
+              error: e,
+              stackTrace: stackTrace);
+          throw Exception(
+              'Request failed after \$_maxRetries retries: \$e\\n\$stackTrace');
         }
         await Future.delayed(Duration(seconds: 2 * retryCount));
       }
@@ -1084,23 +1113,32 @@ class HttpsCalls {
   }
 
   Future<http.Response> getApiHits(String lControllerUrl) {
-    return _performRequest(lControllerUrl, () => _sendRequest(HttpMethod.GET, lControllerUrl));
+    return _performRequest(
+        lControllerUrl, () => _sendRequest(HttpMethod.GET, lControllerUrl));
   }
 
-  Future<http.Response> postApiHits(String lControllerUrl, List<int>? lUtfContent) {
-    return _performRequest(lControllerUrl, () => _sendRequest(HttpMethod.POST, lControllerUrl, body: lUtfContent));
+  Future<http.Response> postApiHits(
+      String lControllerUrl, List<int>? lUtfContent) {
+    return _performRequest(lControllerUrl,
+        () => _sendRequest(HttpMethod.POST, lControllerUrl, body: lUtfContent));
   }
 
-  Future<http.Response> putApiHits(String lControllerUrl, List<int> lUtfContent) {
-    return _performRequest(lControllerUrl, () => _sendRequest(HttpMethod.PUT, lControllerUrl, body: lUtfContent));
+  Future<http.Response> putApiHits(
+      String lControllerUrl, List<int> lUtfContent) {
+    return _performRequest(lControllerUrl,
+        () => _sendRequest(HttpMethod.PUT, lControllerUrl, body: lUtfContent));
   }
 
-  Future<http.Response> patchApiHits(String lControllerUrl, List<int> lUtfContent) {
-    return _performRequest(lControllerUrl, () => _sendRequest(HttpMethod.PATCH, lControllerUrl, body: lUtfContent));
+  Future<http.Response> patchApiHits(
+      String lControllerUrl, List<int> lUtfContent) {
+    return _performRequest(lControllerUrl,
+        () => _sendRequest(HttpMethod.PATCH, lControllerUrl, body: lUtfContent));
   }
 
-  Future<http.Response> deleteApiHits(String lControllerUrl, List<int>? lUtfContent) {
-    return _performRequest(lControllerUrl, () => _sendRequest(HttpMethod.DELETE, lControllerUrl, body: lUtfContent));
+  Future<http.Response> deleteApiHits(
+      String lControllerUrl, List<int>? lUtfContent) {
+    return _performRequest(lControllerUrl,
+        () => _sendRequest(HttpMethod.DELETE, lControllerUrl, body: lUtfContent));
   }
 
   Future<http.Response> _genericMultipartRequest(
@@ -1130,7 +1168,8 @@ class HttpsCalls {
           request.files.add(await http.MultipartFile.fromPath(key, value.path));
         } else if (value is List<File>) {
           for (int i = 0; i < value.length; i++) {
-            request.files.add(await http.MultipartFile.fromPath('\$key[\$i]', value[i].path));
+            request.files
+                .add(await http.MultipartFile.fromPath('\$key[\$i]', value[i].path));
           }
         }
       }
@@ -1212,7 +1251,8 @@ class HttpsCalls {
 }
 ''');
 
-    await File(path.join(servicesDir.path, 'shared_preferences_service.dart')).writeAsString('''
+    await File(path.join(servicesDir.path, 'shared_preferences_service.dart'))
+        .writeAsString('''
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'logger_service.dart';
@@ -1281,7 +1321,8 @@ class SharedPreferencesService {
 }
 ''');
 
-    await File(path.join(servicesDir.path, 'json_extractor.dart')).writeAsString('''
+    await File(path.join(servicesDir.path, 'json_extractor.dart'))
+        .writeAsString('''
 import 'dart:convert';
 import '../config/global_variables.dart';
 import 'logger_service.dart';
@@ -1309,7 +1350,20 @@ class MessageExtractor {
 }
 ''');
 
-    await File(path.join(servicesDir.path, 'location_service.dart')).writeAsString('''
+    await File(path.join(servicesDir.path, 'global_variables.dart'))
+        .writeAsString('''
+import 'app_enums.dart';
+
+/// Global variables for the LayerX app.
+class GlobalVariables {
+  static List<String> errorMessages = ['Failed, Try Again'];
+  static UserRole userRole = UserRole.DRIVER;
+  static String route = '';
+}
+''');
+
+    await File(path.join(servicesDir.path, 'location_service.dart'))
+        .writeAsString('''
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'logger_service.dart';
@@ -1342,13 +1396,16 @@ class LocationService {
     if (permission == LocationPermission.deniedForever) {
       LoggerService.w('Location permission permanently denied');
       await openAppSettings();
-      throw Exception('Location permission permanently denied. Please enable it in app settings.');
+      throw Exception(
+          'Location permission permanently denied. Please enable it in app settings.');
     }
 
     // Step 3: Get current position
     try {
-      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-      LoggerService.i('Location retrieved: \${position.latitude}, \${position.longitude}');
+      final position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      LoggerService.i(
+          'Location retrieved: \${position.latitude}, \${position.longitude}');
       return position;
     } catch (e) {
       LoggerService.e('Error fetching location: \$e');
@@ -1358,7 +1415,8 @@ class LocationService {
 }
 ''');
 
-    await File(path.join(servicesDir.path, 'api_response_handler.dart')).writeAsString('''
+    await File(path.join(servicesDir.path, 'api_response_handler.dart'))
+        .writeAsString('''
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
@@ -1400,7 +1458,8 @@ class ApiResponseHandler {
         break;
 
       default:
-        _handleError(response, 'API Error: \${response.statusCode} - \${response.reasonPhrase}');
+        _handleError(
+            response, 'API Error: \${response.statusCode} - \${response.reasonPhrase}');
     }
     throw Exception('Unexpected error occurred.');
   }
@@ -1418,11 +1477,13 @@ class ApiResponseHandler {
   static void _handleError(dynamic response, String errorMessage) {
     try {
       final errorResponse = jsonDecode(response.body);
-      final message = 'errorMessage: \${errorResponse['message'] ?? 'No details available'}';
+      final message =
+          'errorMessage: \${errorResponse['message'] ?? 'No details available'}';
       LoggerService.e(message);
       throw Exception(message);
     } catch (e, stack) {
-      LoggerService.e('Error handling failed: \$e', error: e, stackTrace: stack);
+      LoggerService.e('Error handling failed: \$e',
+          error: e, stackTrace: stack);
       throw Exception(errorMessage);
     }
   }
@@ -1433,7 +1494,8 @@ class ApiResponseHandler {
 }
 ''');
 
-    await File(path.join(servicesDir.path, 'logger_service.dart')).writeAsString('''
+    await File(path.join(servicesDir.path, 'logger_service.dart'))
+        .writeAsString('''
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
@@ -1476,7 +1538,9 @@ class CustomPrinter extends LogPrinter {
     final dateTime = DateTime.now();
     final formattedTime = DateFormat('dd-MM-yyyy hh:mm:ss a').format(dateTime);
     final levelName = event.level.name.toUpperCase();
-    return output.map((line) => '[📅 \$formattedTime] [\$levelName] \$line').toList();
+    return output
+        .map((line) => '[📅 \$formattedTime] [\$levelName] \$line')
+        .toList();
   }
 }
 
@@ -1529,10 +1593,12 @@ class LoggerService {
   }
 
   Future<void> _createRepositoryFiles(String appDirPath) async {
-    final authRepoDir = Directory(path.join(appDirPath, 'repository', 'auth_repo'));
+    final authRepoDir =
+        Directory(path.join(appDirPath, 'repository', 'auth_repo'));
     final apiRepoDir = Directory(path.join(appDirPath, 'repository', 'apis'));
 
-    await File(path.join(authRepoDir.path, 'auth_repository.dart')).writeAsString('''
+    await File(path.join(authRepoDir.path, 'auth_repository.dart'))
+        .writeAsString('''
 import 'package:http/http.dart' as http;
 import '../../config/app_urls.dart';
 import '../../mvvm/model/api_response_model/api_response.dart';
@@ -1546,11 +1612,13 @@ import '../../services/logger_service.dart';
 class AuthRepository {
   final HttpsCalls _httpsCalls = HttpsCalls();
 
-  Future<ApiResponse<void>> driverSignUpApi(DriverSignupBodyModel signUpBodyModel) async {
+  Future<ApiResponse<void>> driverSignUpApi(
+      DriverSignupBodyModel signUpBodyModel) async {
     try {
       const endPoint = AppUrls.signup;
       LoggerService.d('Initiating driver signup API call');
-      final response = await _httpsCalls.multipartDriverProfileApiHits(endPoint, signUpBodyModel);
+      final response =
+          await _httpsCalls.multipartDriverProfileApiHits(endPoint, signUpBodyModel);
       return await ApiResponseHandler.process(response, endPoint, (dataJson) {});
     } catch (e, stackTrace) {
       ApiResponseHandler.logUnhandledError(e, stackTrace);
@@ -1558,11 +1626,13 @@ class AuthRepository {
     }
   }
 
-  Future<ApiResponse<void>> updateDriver(DriverSignupBodyModel signUpBodyModel) async {
+  Future<ApiResponse<void>> updateDriver(
+      DriverSignupBodyModel signUpBodyModel) async {
     try {
       const endPoint = AppUrls.updateAccount;
       LoggerService.d('Initiating driver update API call');
-      final response = await _httpsCalls.multipartDriverProfileApiHits(endPoint, signUpBodyModel);
+      final response =
+          await _httpsCalls.multipartDriverProfileApiHits(endPoint, signUpBodyModel);
       return await ApiResponseHandler.process(response, endPoint, (dataJson) {});
     } catch (e, stackTrace) {
       ApiResponseHandler.logUnhandledError(e, stackTrace);
@@ -1570,11 +1640,13 @@ class AuthRepository {
     }
   }
 
-  Future<ApiResponse<void>> garageSignUpApi(GarageSignupBodyModel signUpBodyModel) async {
+  Future<ApiResponse<void>> garageSignUpApi(
+      GarageSignupBodyModel signUpBodyModel) async {
     try {
       const endPoint = AppUrls.signup;
       LoggerService.d('Initiating garage signup API call');
-      final response = await _httpsCalls.multipartGarageProfileApiHits(endPoint, signUpBodyModel);
+      final response =
+          await _httpsCalls.multipartGarageProfileApiHits(endPoint, signUpBodyModel);
       return await ApiResponseHandler.process(response, endPoint, (dataJson) {});
     } catch (e, stackTrace) {
       ApiResponseHandler.logUnhandledError(e, stackTrace);
@@ -1584,7 +1656,8 @@ class AuthRepository {
 }
 ''');
 
-    await File(path.join(apiRepoDir.path, 'data_repository.dart')).writeAsString('''
+    await File(path.join(apiRepoDir.path, 'data_repository.dart'))
+        .writeAsString('''
 import 'package:http/http.dart' as http;
 import '../../config/app_urls.dart';
 import '../../mvvm/model/api_response_model/api_response.dart';
@@ -1614,7 +1687,8 @@ class DataRepository {
     try {
       const endPoint = AppUrls.signup; // TODO: Update with correct endpoint
       LoggerService.d('Initiating buy car API call');
-      final response = await _httpsCalls.multipartBuyCarRequestApi(endPoint, buyRequestModel);
+      final response =
+          await _httpsCalls.multipartBuyCarRequestApi(endPoint, buyRequestModel);
       return await ApiResponseHandler.process(response, endPoint, (dataJson) {});
     } catch (e, stackTrace) {
       ApiResponseHandler.logUnhandledError(e, stackTrace);
